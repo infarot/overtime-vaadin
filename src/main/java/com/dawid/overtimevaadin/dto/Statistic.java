@@ -21,6 +21,10 @@ public class Statistic {
         return balance;
     }
 
+    public String getFormattedBalance() {
+        return balance.toString().substring(2);
+    }
+
     public void setBalance(Duration balance) {
         this.balance = balance;
     }

@@ -5,4 +5,5 @@ public class OvertimeURI {
     public static String login = address + "/login";
     public static String register = address + "/sign-up";
     public static String employee = address + "/employee";
+    public static String overtime = address + "/employee/overtime/";
 }

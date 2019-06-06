@@ -4,13 +4,13 @@ import com.dawid.overtimevaadin.communication.request.EmployeeRequest;
 import com.dawid.overtimevaadin.dto.Employee;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
@@ -30,18 +30,23 @@ public class MainView extends VerticalLayout {
             register.addClickListener(this::proceedRegister);
             Button login = new Button("Login");
             login.addClickListener(this::proceedLogin);
-
             horizontalLayout.add(register, login);
             add(header, label, horizontalLayout);
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         } else {
-            EmployeeRequest employeeRequest = new EmployeeRequest();
-            Grid<Employee> grid = new Grid<>();
-            grid.addColumn(Employee::getId).setHeader("Id").setComparator(Comparator.comparingLong(Employee::getId));
-            grid.addColumn(Employee::getName).setHeader("Name");
-            grid.addColumn(Employee::getLastName).setHeader("Last Name");
-            grid.addColumn(e -> e.getStatistic().getBalance()).setHeader("Balance");
 
+            EmployeeRequest employeeRequest = new EmployeeRequest();
+            TreeGrid<Employee> grid = new TreeGrid<>();
+            grid.addColumn(Employee::getName).setHeader("Name");
+            grid.addColumn(Employee::getLastName).setHeader("Last name");
+            grid.addColumn(e -> e.getStatistic().getFormattedBalance()).setHeader("Balance");
+            grid.addSelectionListener(selectionEvent -> selectionEvent.getFirstSelectedItem().
+                    ifPresent(e -> {
+                        Dialog dialog = new Dialog(new OvertimeForm(e.getStatistic().getOvertime(), e.getId()));
+                        dialog.setWidth("800px");
+                        dialog.setHeight("500px");
+                        dialog.open();
+                    }));
 
             Icon icon = VaadinIcon.PLUS.create();
 

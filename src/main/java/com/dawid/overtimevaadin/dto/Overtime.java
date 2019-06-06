@@ -1,16 +1,32 @@
 package com.dawid.overtimevaadin.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Duration;
 import java.time.LocalDate;
 
-public class Overtime {
+public class Overtime implements Comparable<Overtime> {
     private Duration amount;
     private LocalDate overtimeDate;
     private LocalDate pickUpDate;
     private String remarks;
+    private String stringAmount;
+
+    @JsonIgnore
+    public String getStringAmount() {
+        return stringAmount;
+    }
+
+    public void setStringAmount(String stringAmount) {
+        this.stringAmount = stringAmount;
+    }
 
     public Duration getAmount() {
         return amount;
+    }
+
+    public String getFormattedAmount() {
+        return amount.toString().substring(2);
     }
 
     public void setAmount(Duration amount) {
@@ -39,5 +55,22 @@ public class Overtime {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Overtime{" +
+                "amount=" + amount +
+                ", overtimeDate=" + overtimeDate +
+                ", pickUpDate=" + pickUpDate +
+                ", remarks='" + remarks + '\'' +
+                ", stringAmount='" + stringAmount + '\'' +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Overtime o) {
+        return o.getOvertimeDate().compareTo(getOvertimeDate());
     }
 }
