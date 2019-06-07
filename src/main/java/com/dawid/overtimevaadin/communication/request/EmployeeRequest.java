@@ -24,8 +24,6 @@ public class EmployeeRequest {
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
