@@ -50,4 +50,23 @@ public class EmployeeRequest {
         }
         return valid.getStatusCodeValue();
     }
+
+    public Integer deleteEmployee(Long id) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", VaadinSession.getCurrent().getAttribute("token").toString());
+        HttpEntity<String> entity = new HttpEntity<>("", httpHeaders);
+        ResponseEntity<Object> valid;
+        try {
+            valid = restTemplate.exchange(
+                    OvertimeURI.employee + "/" + id,
+                    HttpMethod.DELETE,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return valid.getStatusCodeValue();
+    }
 }
