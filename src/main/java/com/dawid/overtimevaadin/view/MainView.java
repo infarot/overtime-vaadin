@@ -37,9 +37,12 @@ public class MainView extends VerticalLayout {
 
             EmployeeRequest employeeRequest = new EmployeeRequest();
             TreeGrid<Employee> grid = new TreeGrid<>();
-            grid.addColumn(Employee::getName).setHeader("Name");
-            grid.addColumn(Employee::getLastName).setHeader("Last name");
-            grid.addColumn(e -> e.getStatistic().getFormattedBalance()).setHeader("Balance");
+            grid.addColumn(Employee::getName).setHeader("Name")
+                    .setComparator(Comparator.comparing(Employee::getName));
+            grid.addColumn(Employee::getLastName).setHeader("Last name")
+                    .setComparator(Comparator.comparing(Employee::getLastName));
+            grid.addColumn(e -> e.getStatistic().getFormattedBalance()).setHeader("Balance")
+                    .setComparator(Comparator.comparing(e -> e.getStatistic().getBalance()));
             grid.addSelectionListener(selectionEvent -> selectionEvent.getFirstSelectedItem().
                     ifPresent(e -> {
                         Dialog dialog = new Dialog(new OvertimeForm(e.getStatistic().getOvertime(), e.getId()));
