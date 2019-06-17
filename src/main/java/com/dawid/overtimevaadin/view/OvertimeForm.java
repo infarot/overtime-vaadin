@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -21,6 +22,7 @@ public class OvertimeForm extends VerticalLayout {
 
     public OvertimeForm(Set<Overtime> overtime, Long employeeId) {
         this.employeeId = employeeId;
+        Label ctrlInfo = new Label("Hold ctrl to proceed");
         Button delete = new Button("Delete this employee");
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         delete.addClickListener(this::proceedDelete);
@@ -51,14 +53,16 @@ public class OvertimeForm extends VerticalLayout {
                 }));
 
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        add(add, grid, delete);
+        add(add, grid, ctrlInfo, delete);
     }
 
     private void proceedDelete(ClickEvent clickEvent) {
         try {
-            EmployeeRequest employeeRequest = new EmployeeRequest();
-            employeeRequest.deleteEmployee(employeeId);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            if (clickEvent.isCtrlKey()) {
+                EmployeeRequest employeeRequest = new EmployeeRequest();
+                employeeRequest.deleteEmployee(employeeId);
+                getUI().ifPresent(ui -> ui.getPage().reload());
+            }
         } catch (Exception e) {
             Notification.show("Unable to delete employee");
         }

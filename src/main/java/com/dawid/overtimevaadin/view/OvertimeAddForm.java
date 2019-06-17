@@ -3,7 +3,6 @@ package com.dawid.overtimevaadin.view;
 import com.dawid.overtimevaadin.communication.request.OvertimeRequest;
 import com.dawid.overtimevaadin.dto.Overtime;
 import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.notification.Notification;
@@ -24,6 +23,7 @@ public class OvertimeAddForm extends VerticalLayout {
     private DatePicker pickUpDate = new DatePicker("Equalization date");
     private TextArea remarks = new TextArea("Remarks");
     private Button save = new Button("Save", this::proceedAdd);
+    private Button deleteOvertime = new Button("Delete", this::proceedDeleteOvertime);
 
 
     public OvertimeAddForm(Long employeeId) {
@@ -53,9 +53,8 @@ public class OvertimeAddForm extends VerticalLayout {
         binder.readBean(overtime);
         binder.setBean(overtime);
 
-        overtimeDate.setEnabled(false);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        add(amount, overtimeDate, pickUpDate, remarks, save);
+        add(amount, overtimeDate, pickUpDate, remarks, save, deleteOvertime);
     }
 
     private void proceedAdd(ClickEvent clickEvent) {
@@ -82,6 +81,17 @@ public class OvertimeAddForm extends VerticalLayout {
             } catch (Exception e) {
                 Notification.show("Invalid request or server is offline");
             }
+        }
+    }
+
+    private void proceedDeleteOvertime(ClickEvent clickEvent) {
+        Overtime overtime = binder.getBean();
+        try {
+            OvertimeRequest overtimeRequest = new OvertimeRequest();
+            overtimeRequest.deleteOvertime(overtime, employeeId);
+            getUI().ifPresent(ui -> ui.getPage().reload());
+        } catch (Exception e) {
+            Notification.show("Unable to delete overtime");
         }
     }
 }

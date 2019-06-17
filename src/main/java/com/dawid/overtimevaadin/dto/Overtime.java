@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 public class Overtime implements Comparable<Overtime> {
+
+    private Long id;
     private Duration amount;
     private LocalDate overtimeDate;
     private LocalDate pickUpDate;
@@ -15,6 +17,14 @@ public class Overtime implements Comparable<Overtime> {
     @JsonIgnore
     public String getStringAmount() {
         return stringAmount;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setStringAmount(String stringAmount) {
