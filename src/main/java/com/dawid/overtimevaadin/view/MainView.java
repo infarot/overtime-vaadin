@@ -17,14 +17,14 @@ import com.vaadin.flow.server.VaadinSession;
 
 import java.util.Comparator;
 import java.util.List;
-
+import java.util.Locale;
 
 @Route("")
 public class MainView extends VerticalLayout {
     private Label header = new Label("Employee hour management system");
 
     public MainView() {
-
+        VaadinSession.getCurrent().setLocale(new Locale("pl","PL"));
         if (VaadinSession.getCurrent().getAttribute("token") == null) {
             showUIWhenLoggedOut();
         } else {
