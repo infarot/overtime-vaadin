@@ -1,7 +1,6 @@
 package com.dawid.overtimevaadin.communication.request;
 
 import com.dawid.overtimevaadin.communication.constant.OvertimeURI;
-import com.dawid.overtimevaadin.dto.Employee;
 import com.dawid.overtimevaadin.dto.Overtime;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.core.ParameterizedTypeReference;
