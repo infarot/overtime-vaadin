@@ -1,7 +1,7 @@
 package com.dawid.overtimevaadin.view;
 
-import com.dawid.overtimevaadin.communication.request.EmployeeRequest;
-import com.dawid.overtimevaadin.dto.Employee;
+import com.dawid.overtimevaadin.client.OvertimeClient;
+import com.overtime.api.EmployeeDto;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -14,23 +14,29 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 @Route("")
-public class MainView extends VerticalLayout {
+class MainView extends VerticalLayout {
+
+    private final OvertimeClient overtimeClient;
+
     private Label header = new Label("Employee hour management system");
 
-    public MainView() {
-        VaadinSession.getCurrent().setLocale(new Locale("pl","PL"));
+    @Autowired
+    MainView(OvertimeClient overtimeClient) {
+        this.overtimeClient = overtimeClient;
+        VaadinSession.getCurrent().setLocale(new Locale("pl", "PL"));
         if (VaadinSession.getCurrent().getAttribute("token") == null) {
             showUIWhenLoggedOut();
         } else {
             try {
                 showUIWhenLoggedIn();
-            } catch (Exception e){
+            } catch (Exception e) {
                 Notification.show("Please login first");
                 showUIWhenLoggedOut();
             }
@@ -50,16 +56,16 @@ public class MainView extends VerticalLayout {
     }
 
     private void showUIWhenLoggedIn() {
-        TreeGrid<Employee> grid = new TreeGrid<>();
-        grid.addColumn(Employee::getName).setHeader("Name")
-                .setComparator(Comparator.comparing(Employee::getName));
-        grid.addColumn(Employee::getLastName).setHeader("Last name")
-                .setComparator(Comparator.comparing(Employee::getLastName));
-        grid.addColumn(e -> e.getStatistic().getFormattedBalance()).setHeader("Balance")
-                .setComparator(Comparator.comparing(e -> e.getStatistic().getBalance()));
+        TreeGrid<EmployeeDto> grid = new TreeGrid<>();
+        grid.addColumn(EmployeeDto::getName).setHeader("Name")
+                .setComparator(Comparator.comparing(EmployeeDto::getName));
+        grid.addColumn(EmployeeDto::getLastName).setHeader("Last name")
+                .setComparator(Comparator.comparing(EmployeeDto::getLastName));
+        grid.addColumn(EmployeeDto::getBalance).setHeader("Balance")
+                .setComparator(Comparator.comparing(EmployeeDto::getBalance));
         grid.addSelectionListener(selectionEvent -> selectionEvent.getFirstSelectedItem().
                 ifPresent(e -> {
-                    Dialog dialog = new Dialog(new OvertimeForm(e.getStatistic().getOvertime(), e.getId()));
+                    Dialog dialog = new Dialog(new OvertimeForm(e.getOvertime(), e.getId(), overtimeClient));
                     dialog.setWidth("800px");
                     dialog.setHeight("500px");
                     dialog.open();
@@ -73,21 +79,19 @@ public class MainView extends VerticalLayout {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         grid.setItems(getUserEmployeeList());
 
-
         add(header, addEmployee, grid, logout);
     }
 
-    private List<Employee> getUserEmployeeList(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
-        return employeeRequest.getAllEmployee();
+    private List<EmployeeDto> getUserEmployeeList() {
+        return overtimeClient.getAllEmployees();
     }
 
     private void proceedLogin(ClickEvent event) {
-        getUI().ifPresent((ui) -> ui.getPage().executeJavaScript("window.location.href = '/login'"));
+        getUI().ifPresent(ui -> ui.getPage().executeJs("window.location.href = '/login'"));
     }
 
     private void proceedRegister(ClickEvent event) {
-        getUI().ifPresent((ui) -> ui.getPage().executeJavaScript("window.location.href = '/sign-up'"));
+        getUI().ifPresent(ui -> ui.getPage().executeJs("window.location.href = '/sign-up'"));
     }
 
     private void proceedLogout(ClickEvent event) {
@@ -96,6 +100,6 @@ public class MainView extends VerticalLayout {
     }
 
     private void proceedEmployeeAdd(ClickEvent event) {
-        getUI().ifPresent((ui) -> ui.getPage().executeJavaScript("window.location.href = '/add-employee'"));
+        getUI().ifPresent(ui -> ui.getPage().executeJs("window.location.href = '/add-employee'"));
     }
 }

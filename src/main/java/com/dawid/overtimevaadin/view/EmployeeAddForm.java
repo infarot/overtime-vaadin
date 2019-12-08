@@ -1,7 +1,7 @@
 package com.dawid.overtimevaadin.view;
 
-import com.dawid.overtimevaadin.communication.request.EmployeeRequest;
-import com.dawid.overtimevaadin.dto.Employee;
+import com.dawid.overtimevaadin.client.OvertimeClient;
+import com.overtime.api.EmployeeDto;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -17,53 +17,52 @@ import com.vaadin.flow.server.VaadinSession;
 
 @Route("add-employee")
 public class EmployeeAddForm extends HorizontalLayout {
-    private TextField name = new TextField("Name");
-    private TextField lastName = new TextField("Last name");
-    private Button add = new Button("Add");
-    private Button back = new Button("Back");
-    private Binder<Employee> binder = new Binder<>(Employee.class);
 
+    private final OvertimeClient overtimeClient;
 
-    public EmployeeAddForm() {
+    private Binder<EmployeeDto> binder = new Binder<>(EmployeeDto.class);
+
+    public EmployeeAddForm(OvertimeClient overtimeClient) {
+        this.overtimeClient = overtimeClient;
         if (VaadinSession.getCurrent().getAttribute("token") != null) {
             VerticalLayout verticalLayout = new VerticalLayout();
+            Button add = new Button("Add");
             add.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             add.addClickListener(this::proceedEmployeeAdd);
             add.addClickShortcut(Key.ENTER);
+            Button back = new Button("Back");
             back.addClickListener(this::proceedBack);
-
 
             verticalLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
             HorizontalLayout buttons = new HorizontalLayout();
             buttons.add(add, back);
+            TextField lastName = new TextField("Last name");
+            TextField name = new TextField("Name");
             verticalLayout.add(name, lastName, buttons);
             add(verticalLayout);
             setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 
-
-            Employee employee = new Employee();
-            binder.bindInstanceFields(this);
+            EmployeeDto employee = new EmployeeDto();
+            binder.forField(name).bind(EmployeeDto::getName, EmployeeDto::setName);
+            binder.forField(lastName).bind(EmployeeDto::getLastName, EmployeeDto::setLastName);
             binder.readBean(employee);
             binder.setBean(employee);
         } else {
-            add(new MainView());
+            add(new MainView(overtimeClient));
         }
-
     }
 
     private void proceedEmployeeAdd(ClickEvent event) {
-        Employee employee = binder.getBean();
+        EmployeeDto employee = binder.getBean();
         try {
-            EmployeeRequest employeeRequest = new EmployeeRequest();
-            employeeRequest.addEmployee(employee);
-            getUI().ifPresent((ui) -> ui.getPage().executeJavaScript("window.location.href = '/'"));
+            overtimeClient.addEmployee(employee);
+            getUI().ifPresent(ui -> ui.getPage().executeJs("window.location.href = '/'"));
         } catch (Exception e) {
             Notification.show("Please provide valid employee credentials");
         }
     }
 
     private void proceedBack(ClickEvent event) {
-        getUI().ifPresent((ui) -> ui.getPage().executeJavaScript("window.location.href = '/'"));
+        getUI().ifPresent(ui -> ui.getPage().executeJs("window.location.href = '/'"));
     }
-
 }

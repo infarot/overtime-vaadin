@@ -1,0 +1,7 @@
+server:
+  port: 8082
+spring:
+  jackson:
+    locale: pl_PL
+    time-zone: Europe/Warsaw
+overtime: http://127.0.0.1:5002/
